@@ -41,4 +41,4 @@ jobs:
         github_token: ${{ secrets.TOKEN_WORKFLOWS }}
 
     - name: Spider jar
-      uses: ./Spider
+      uses: ./.github/workflows/Spider
