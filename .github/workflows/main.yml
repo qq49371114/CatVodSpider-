@@ -29,7 +29,7 @@ jobs:
       run: |        
         git clone --recurse-submodules https://github.com/Greatwallcorner/CatVodSpider Project
         cp -r Project/* ${{ github.workspace }}
-        cp -r Project/.github/workflows/* ${{ github.workspace }}/.github/workflows/
+        #cp -r Project/.github/workflows/* ${{ github.workspace }}/.github/workflows/
         rm -rf Project
 
     - name: Update files
