@@ -40,6 +40,7 @@ jobs:
         add: ${{ github.workspace }}/*
         github_token: ${{ secrets.TOKEN_WORKFLOWS }}
 
+    - uses: actions/checkout@main
     - name: set up JDK
       uses: actions/setup-java@main
       with:
