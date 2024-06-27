@@ -12,10 +12,10 @@ jobs:
     steps:
       # 检出代码
     - uses: actions/checkout@main
-      with:
+      #with:
            # persist-credentials: false
-           token: ${{ secrets.TOKEN_WORKFLOWS }}  #必须加上GITHUB_TOKEN,否则不能更新带WORKFLOW的变动
-           fetch-depth: 0
+           #token: ${{ secrets.TOKEN_WORKFLOWS }}  #必须加上GITHUB_TOKEN,否则不能更新带WORKFLOW的变动
+           #fetch-depth: 0
            
       # 删除旧的工作流
     - name: Delete action workflows
