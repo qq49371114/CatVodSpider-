@@ -40,5 +40,32 @@ jobs:
         add: ${{ github.workspace }}/*
         github_token: ${{ secrets.TOKEN_WORKFLOWS }}
 
-    - name: Spider jar
-      uses: ./.github/actions/setup
+    - name: set up JDK
+      uses: actions/setup-java@main
+      with:
+        java-version: '18'
+        distribution: 'temurin'
+
+    - name: DIY The Jar
+      run: |    
+         rm -rf jar/*
+
+    - name: Build the Jar
+      run: |        
+         chmod +x gradlew
+         ./gradlew task
+         ./gradlew assemble
+         echo $(md5sum jar/spider.jar | awk '{print $1}') > jar/spider.jar.md5
+                  
+    - name: Upload APK
+      uses: actions/upload-artifact@main
+      with:
+        name: spider
+        path: ./jar/spider.jar
+
+    - name: Update spider jar      
+      uses: EndBug/add-and-commit@main
+      with:
+        default_author: github_actions
+        message: 'update spider jar'
+        add: "['./jar/spider.jar', './jar/spider.jar.md5']"
