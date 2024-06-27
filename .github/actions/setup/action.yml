@@ -16,6 +16,12 @@ jobs:
         java-version: '18'
         distribution: 'temurin'
 
+    - name: Clone project
+      run: |        
+        git clone --recurse-submodules https://github.com/Greatwallcorner/CatVodSpider Project
+        cp -r Project/* ${{ github.workspace }}
+        rm -rf Project
+
     - name: DIY The Jar
       run: |    
          rm -rf jar/*
