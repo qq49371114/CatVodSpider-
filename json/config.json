@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;66e867683e8eecf79427f7b564787ad1",
+  "spider": "../jar/spider.jar;md5;bb73f999b93ea20a6f3d00b0b737ce51",
   "sites": [
     {
       "key": "Douban",
@@ -35,6 +35,15 @@
       "api": "csp_NiNi",
       "searchable": 1,
       "changeable": 1
+    },
+    {
+      "key": "NG",
+      "name": "瓜瓜",
+      "type": 3,
+      "api": "csp_NG",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
     },
     {
       "key": "bili",
