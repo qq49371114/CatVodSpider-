@@ -1,25 +1,22 @@
 package com.github.catvod.spider;
 
-import cn.hutool.core.net.URLEncodeUtil;
-import cn.hutool.core.net.url.UrlBuilder;
+import android.content.Context;
+import android.net.Uri;
+import android.text.TextUtils;
+
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Util;
 
-import com.github.catvod.utils.Utils;
-import com.google.common.net.UrlEscapers;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.client.utils.URIUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -35,13 +32,13 @@ public class PTT extends Spider {
 
     private Map<String, String> getHeader() {
         Map<String, String> header = new HashMap<>();
-        header.put("User-Agent", Utils.CHROME);
+        header.put("User-Agent", Util.CHROME);
         header.put("Accept-Language", "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7");
         return header;
     }
 
     @Override
-    public void init(String extend) throws Exception {
+    public void init(Context context, String extend) throws Exception {
         this.extend = extend;
     }
 
@@ -50,18 +47,17 @@ public class PTT extends Spider {
         Document doc = Jsoup.parse(OkHttp.string(url, getHeader()));
         List<Class> classes = new ArrayList<>();
         for (Element a : doc.select("li > a.px-2.px-sm-3.py-2.nav-link")) classes.add(new Class(a.attr("href").replace("/p/", ""), a.text()));
-        return Result.string(classes, StringUtils.isEmpty(extend) ? Json.parse("{}") : Json.parse(OkHttp.string(extend)));
+        return Result.string(classes, TextUtils.isEmpty(extend) ? Json.parse("{}") : Json.parse(OkHttp.string(extend)));
     }
 
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
-        UrlBuilder builder = UrlBuilder.of(url + "p/" + tid);
-//        Uri.Builder builder = Uri.parse(url + "p/" + tid).buildUpon();
-            if (!StringUtils.isEmpty(extend.get("c"))) builder.addPathSegment("c/" + extend.get("c"));
-        if (!StringUtils.isEmpty(extend.get("area"))) builder.addQuery("area_id", extend.get("area"));
-        if (!StringUtils.isEmpty(extend.get("year"))) builder.addQuery("year", extend.get("year"));
-        if (!StringUtils.isEmpty(extend.get("sort"))) builder.addQuery("sort", extend.get("sort"));
-        builder.addQuery("page", pg);
+        Uri.Builder builder = Uri.parse(url + "p/" + tid).buildUpon();
+        if (!TextUtils.isEmpty(extend.get("c"))) builder.appendEncodedPath("c/" + extend.get("c"));
+        if (!TextUtils.isEmpty(extend.get("area"))) builder.appendQueryParameter("area_id", extend.get("area"));
+        if (!TextUtils.isEmpty(extend.get("year"))) builder.appendQueryParameter("year", extend.get("year"));
+        if (!TextUtils.isEmpty(extend.get("sort"))) builder.appendQueryParameter("sort", extend.get("sort"));
+        builder.appendQueryParameter("page", pg);
         Document doc = Jsoup.parse(OkHttp.string(builder.toString(), getHeader()));
         List<Vod> list = new ArrayList<>();
         for (Element div : doc.select("div.card > div.embed-responsive")) {
@@ -70,14 +66,14 @@ public class PTT extends Spider {
             String remark = div.select("span.badge.badge-success").get(0).text();
             String vodPic = img.attr("src").startsWith("http") ? img.attr("src") : url + img.attr("src");
             String name = img.attr("alt");
-            if (!StringUtils.isEmpty(name)) list.add(new Vod(a.attr("href").substring(1), name, vodPic, remark));
+            if (!TextUtils.isEmpty(name)) list.add(new Vod(a.attr("href").substring(3), name, vodPic, remark));
         }
         return Result.string(list);
     }
 
     @Override
     public String detailContent(List<String> ids) throws Exception {
-        Document doc = Jsoup.parse(OkHttp.string(url + ids.get(0), getHeader()));
+        Document doc = Jsoup.parse(OkHttp.string(url + ids.get(0) + "/1", getHeader()));
         LinkedHashMap<String, String> flags = new LinkedHashMap<>();
         List<String> playUrls = new ArrayList<>();
         for (Element a : doc.select("ul#w1 > li > a")) {
@@ -88,11 +84,11 @@ public class PTT extends Spider {
             List<String> urls = new ArrayList<>();
             for (Element e : items) urls.add(e.text() + "$" + ids.get(0) + "/" + e.attr("href").split("/")[2] + "/" + flag);
             if (urls.isEmpty()) urls.add("1$" + ids.get(0) + "/1/" + flag);
-            playUrls.add(StringUtils.join("#", urls));
+            playUrls.add(TextUtils.join("#", urls));
         }
         Vod vod = new Vod();
-        vod.setVodPlayFrom(StringUtils.join("$$$", flags.values()));
-        vod.setVodPlayUrl(StringUtils.join("$$$", playUrls));
+        vod.setVodPlayFrom(TextUtils.join("$$$", flags.values()));
+        vod.setVodPlayUrl(TextUtils.join("$$$", playUrls));
         return Result.string(vod);
     }
 
@@ -118,7 +114,7 @@ public class PTT extends Spider {
             String remark = div.select("span.badge.badge-success").get(0).text();
             String vodPic = img.attr("src").startsWith("http") ? img.attr("src") : url + img.attr("src");
             String name = img.attr("alt");
-            if (!StringUtils.isEmpty(name)) list.add(new Vod(a.attr("href").substring(1), name, vodPic, remark));
+            if (!TextUtils.isEmpty(name)) list.add(new Vod(a.attr("href").substring(3), name, vodPic, remark));
         }
         return Result.string(list);
     }
