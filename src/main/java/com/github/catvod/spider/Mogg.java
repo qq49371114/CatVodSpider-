@@ -1,6 +1,5 @@
 package com.github.catvod.spider;
 
-import cn.hutool.core.util.URLUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
@@ -9,12 +8,10 @@ import com.github.catvod.utils.Utils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.jsoup.Jsoup;
-import org.jsoup.internal.StringUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,12 +23,11 @@ import java.util.regex.Pattern;
 /**
  * @author zhixc
  */
-public class Wogg extends Cloud {
+public class Mogg extends Cloud {
 
-    private final String siteUrl = "https://www.wogg.net";
-    private final Pattern regexCategory = Pattern.compile("/vodtype/(\\w+).html");
+    private final String siteUrl = "https://www.mogg.top";
+    private final Pattern regexCategory = Pattern.compile("index.php/vod/type/id/(\\w+).html");
     private final Pattern regexPageTotal = Pattern.compile("\\$\\(\"\\.mac_total\"\\)\\.text\\('(\\d+)'\\);");
-
     private JsonObject extend;
 
     private Map<String, String> getHeader() {
@@ -43,13 +39,12 @@ public class Wogg extends Cloud {
     @Override
     public void init(String extend) throws Exception {
         this.extend = JsonParser.parseString(extend).getAsJsonObject();
-        super.init("");
+        super.init( extend);
     }
 
     @Override
     public String homeContent(boolean filter) {
         List<Class> classes = new ArrayList<>();
-        String url = extend.has("filter") ? extend.get("filter").getAsString() : "";
         Document doc = Jsoup.parse(OkHttp.string(siteUrl, getHeader()));
         Elements elements = doc.select(".nav-link");
         for (Element e : elements) {
@@ -58,7 +53,7 @@ public class Wogg extends Cloud {
                 classes.add(new Class(mather.group(1), e.text().trim()));
             }
         }
-        return Result.string(classes, parseVodListFromDoc(doc), StringUtil.isBlank(url) ? null : JsonParser.parseString(OkHttp.string(url)));
+        return Result.string(classes, parseVodListFromDoc(doc));
     }
 
     @Override
@@ -69,7 +64,7 @@ public class Wogg extends Cloud {
                 urlParams[Integer.parseInt(key)] = extend.get(key);
             }
         }
-        Document doc = Jsoup.parse(OkHttp.string(String.format("%s/index.php/vodshow/%s.html", siteUrl, String.join("-", urlParams)), getHeader()));
+        Document doc = Jsoup.parse(OkHttp.string(String.format("%s/index.php/vod/show/id/%s/page/%s.html", siteUrl, tid, pg), getHeader()));
         int page = Integer.parseInt(pg), limit = 72, total = 0;
         Matcher matcher = regexPageTotal.matcher(doc.html());
         if (matcher.find()) total = Integer.parseInt(matcher.group(1));
@@ -83,9 +78,6 @@ public class Wogg extends Cloud {
         for (Element e : elements) {
             String vodId = e.selectFirst(".video-name a").attr("href");
             String vodPic = e.selectFirst(".module-item-pic > img").attr("data-src");
-            if(!vodPic.startsWith("http")){
-                vodPic = URLUtil.completeUrl(siteUrl, vodPic);
-            }
             String vodName = e.selectFirst(".video-name").text();
             String vodRemarks = e.selectFirst(".module-item-text").text();
             list.add(new Vod(vodId, vodName, vodPic, vodRemarks));
@@ -106,8 +98,10 @@ public class Wogg extends Cloud {
         item.setTypeName(String.join(",", doc.select(".video-info-header div.tag-link a").eachText()));
 
         List<String> shareLinks = doc.select(".module-row-text").eachAttr("data-clipboard-text");
-        for (int i = 0; i < shareLinks.size(); i++) shareLinks.set(i, shareLinks.get(i).trim());
-
+        for (int i = 0; i < shareLinks.size(); i++) {
+            shareLinks.set(i, shareLinks.get(i).trim());
+            //String detailContent = super.detailContent(List.of(shareLinks.get(i)));
+        }
         item.setVodPlayUrl(super.detailContentVodPlayUrl(shareLinks));
         item.setVodPlayFrom(super.detailContentVodPlayFrom(shareLinks));
 
@@ -140,8 +134,9 @@ public class Wogg extends Cloud {
         return searchContent(key, pg);
     }
 
+
     private String searchContent(String key, String pg) {
-        String searchURL = siteUrl + String.format("/index.php/vodsearch/%s----------%s---.html", URLEncoder.encode(key), pg);
+        String searchURL = siteUrl + String.format("/index.php/vod/search/page/%s/wd/%s.html", pg, URLEncoder.encode(key));
         String html = OkHttp.string(searchURL, getHeader());
         Elements items = Jsoup.parse(html).select(".module-search-item");
         List<Vod> list = new ArrayList<>();
