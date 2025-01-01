@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;b870fa4c1dc9e1c24b7bc5dce6ccbd7f",
+  "spider": "../jar/spider.jar;md5;8ebc68f78911a0f4e565b84df4bd2e80",
   "sites": [
     {
       "key": "Douban",
@@ -11,6 +11,33 @@
       "ext": {}
     },
     {
+      "key": "KuaKeBa",
+      "name": "夸克吧",
+      "type": 3,
+      "api": "csp_KuaKeBa",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
+    },
+    {
+      "key": "DianYingYunJi",
+      "name": "电影云集",
+      "type": 3,
+      "api": "csp_DianYingYunJi",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
+    },
+    {
+      "key": "KuaKeS",
+      "name": "夸克网盘社",
+      "type": 3,
+      "api": "csp_KuaKeS",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {}
+    },
+    {
       "key": "BD",
       "name": "BD|首页",
       "type": 3,
@@ -18,6 +45,15 @@
       "searchable": 1,
       "changeable": 0,
       "ext": "aHR0cHM6Ly93d3cueGx5czAxLmNvbS8="
+    },
+    {
+      "key": "xb6v",
+      "name": "xb6v",
+      "type": 3,
+      "api": "csp_Xb6v",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": ""
     },
     {
       "key": "NCat",
@@ -33,6 +69,15 @@
       "name": "金牌 | 影视",
       "type": 3,
       "api": "csp_Glod",
+      "searchable": 0,
+      "changeable": 0,
+      "ext": {}
+    },
+    {
+      "key": "DUB",
+      "name": "DUB",
+      "type": 3,
+      "api": "csp_DUB",
       "searchable": 0,
       "changeable": 0,
       "ext": {}
@@ -216,6 +261,14 @@
       "searchable": 1,
       "changeable": 1,
       "ext": "http://127.0.0.1:9978/file/tvfan/token.txt+4k|auto|fhd",
+      "timeout": 30
+    },
+    {
+      "key": "QiLeSo",
+      "name": "奇乐搜┃搜索",
+      "type": 3,
+      "api": "csp_QiLeSo",
+      "searchable": 1,
       "timeout": 30
     },
     {
