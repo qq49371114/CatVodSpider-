@@ -1,10 +1,12 @@
 package com.github.catvod.spider;
 
+import cn.hutool.core.text.UnicodeUtil;
 import com.github.catvod.bean.Class;
 import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.AESEncryption;
 import com.github.catvod.utils.Utils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,6 +15,7 @@ import org.jsoup.select.Elements;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -20,8 +23,9 @@ import java.util.regex.Pattern;
 
 public class NCat extends Spider {
 
-    private static final String siteUrl = "https://www.ncat3.com:51111";
-    private static final String picUrl = "https://61.147.93.252:15002";
+    private static final String siteUrl = "https://www.ncat3.app";
+//    private static final String siteUrl = "https://www.ncat3.com:51111";
+    private static final String picUrl = "https://vres.wbadl.cn";
     private static final String cateUrl = siteUrl + "/show/";
     private static final String detailUrl = siteUrl + "/detail/";
     private static final String searchUrl = siteUrl + "/search?k=";
@@ -86,7 +90,7 @@ public class NCat extends Spider {
     @Override
     public String detailContent(List<String> ids) throws Exception {
         Document doc = Jsoup.parse(OkHttp.string(detailUrl.concat(ids.get(0)), getHeaders()));
-        String name = doc.select("div.detail-title strong").text();
+        String name = doc.select("div.detail-title strong:nth-child(2)").text();
         String pic = doc.select(".detail-pic img").attr("data-original");
         String year = doc.select("a.detail-tags-item").get(0).text();
         String desc = doc.select("div.detail-desc p").text();
@@ -98,6 +102,7 @@ public class NCat extends Spider {
         String PlayUrl = "";
         for (int i = 0; i < tabs.size(); i++) {
             String tabName = tabs.get(i).text();
+            if(Arrays.asList("超清", "4K(高峰不卡)").contains(tabName)) continue;
             if (!"".equals(PlayFrom)) {
                 PlayFrom = PlayFrom + "$$$" + tabName;
             } else {
@@ -136,7 +141,7 @@ public class NCat extends Spider {
         Document doc = Jsoup.parse(OkHttp.string(searchUrl.concat(URLEncoder.encode(key)).concat(".html"), getHeaders()));
         for (Element element : doc.select("a.search-result-item")) {
             try {
-                String pic = element.select("img").attr("data-original");
+                String pic = element.select("div img:nth-child(2)").attr("data-original");
                 String url = element.attr("href");
                 String name = element.select("img").attr("title");
                 if (!pic.startsWith("http")) {
@@ -153,15 +158,40 @@ public class NCat extends Spider {
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
         Document doc = Jsoup.parse(OkHttp.string(playUrl.concat(id), getHeaders()));
-        String regex = "src: \"(.*?)m3u8\",";
+        String regex = "window.whatTMDwhatTMDPPPP = '(.*?)'";
+        String playSource = "playSource=\\{(.+)\\}";
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(doc.html());
         String url = "";
         if (matcher.find()) {
             url = matcher.group(1);
-            url = url.replace("\\/", "/") + "m3u8";
+            Pattern playSourcePattern = Pattern.compile(playSource);
+            Matcher playSourceMatcher = playSourcePattern.matcher(doc.html());
+            playSourceMatcher.find();
+            String js = playSourceMatcher.group(1);
+
+            String regex1 = "KKYS\\['safePlay'\\]\\(\\)\\['url'\\]\\(\"([^\"]+)\"\\)";
+//            String regex1 = "KKYS\\.safePlay\\(\\)\\.url(\"(.*?)\"),";
+            Pattern pattern1 = Pattern.compile(regex1);
+            Matcher matcher1 = pattern1.matcher(UnicodeUtil.toString(js));
+            String iv = "VNF9aVQF!G*0ux@2hAigUeH3";
+            if (matcher1.find()) {
+                iv = matcher1.group(1);
+            }
+            url = decryptUrl(url, iv);
         }
         return Result.get().url(url).header(getHeaders()).string();
+    }
+
+    public String decryptUrl(String encryptedData, String iv) {
+        try {
+            String encryptedKey = "VNF9aVQF!G*0ux@2hAigUeH3";
+
+            return AESEncryption.decrypt(encryptedData, iv, "",AESEncryption.ECB_PKCS_7_PADDING);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "123456";
+        }
     }
 }

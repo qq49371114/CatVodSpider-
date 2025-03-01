@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;9aa20c99a8636acb2d7201ab868de76e",
+  "spider": "../jar/spider.jar;md5;1d591240715a98247efa00794eae602b",
   "sites": [
     {
       "key": "Douban",
@@ -44,13 +44,41 @@
       "api": "csp_BD",
       "searchable": 1,
       "changeable": 0,
-      "ext": "aHR0cHM6Ly93d3cueGx5czAxLmNvbS8="
+      "ext": "aHR0cHM6Ly92LnhseXMubHRkLnVhLw=="
+    },
+    {
+      "key": "Ddrk",
+      "name": "低端|首页",
+      "type": 3,
+      "api": "csp_Ddrk",
+      "searchable": 1,
+      "changeable": 1,
+      "ext": {
+        "site": "https://ddys.info/"
+      }
+    },
+    {
+      "key": "Tvb",
+      "name": "Tvb|首页",
+      "type": 3,
+      "api": "csp_HkTv",
+      "searchable": 1,
+      "changeable": 1
     },
     {
       "key": "xb6v",
       "name": "xb6v",
       "type": 3,
       "api": "csp_Xb6v",
+      "searchable": 1,
+      "changeable": 0,
+      "ext": ""
+    },
+    {
+      "key": "YHDM",
+      "name": "樱花",
+      "type": 3,
+      "api": "csp_YHDM",
       "searchable": 1,
       "changeable": 0,
       "ext": ""
