@@ -114,9 +114,9 @@ public class OkHttp {
     public static OkHttpClient.Builder getBuilder() {
         return new OkHttpClient.Builder()
 //                .proxy(new java.net.Proxy(Proxy.Type.HTTP, new InetSocketAddress("localhost",7890)))
-                .addInterceptor(new OkhttpInterceptor()).dns(dns()).connectTimeout(3, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS)
-                .writeTimeout(5, TimeUnit.SECONDS)
+                .addInterceptor(new OkhttpInterceptor()).dns(dns()).connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(8, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
                 .sslSocketFactory(SSLSocketClient.getSSLSocketFactory(), SSLSocketClient.getX509TrustManager())
                 .hostnameVerifier((SSLSocketClient.getHostnameVerifier()));
     }
