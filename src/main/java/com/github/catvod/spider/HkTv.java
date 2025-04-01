@@ -6,7 +6,7 @@ import com.github.catvod.bean.Result;
 import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 public class HkTv extends Spider {
 
-    private static String siteUrl = "http://www.tvyb03.com";
+    private static String siteUrl = "http://www.tvyb07.com";
     private static String cateUrl = siteUrl + "/vod/type/id/";
     private static String detailUrl = siteUrl + "/vod/detail/id/";
     private static String playUrl = siteUrl + "/vod/play/id/";
@@ -30,7 +30,7 @@ public class HkTv extends Spider {
 
     private HashMap<String, String> getHeaders() {
         HashMap<String, String> headers = new HashMap<>();
-        headers.put("User-Agent", Utils.CHROME);
+        headers.put("User-Agent", Util.CHROME);
         return headers;
     }
 

@@ -10,7 +10,7 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
-import com.github.catvod.utils.Utils;
+import com.github.catvod.utils.Util;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
@@ -29,6 +29,8 @@ import java.util.regex.Pattern;
 public class Mtyy extends Spider {
 
     private static final String siteUrl = "https://mtyy2.com";
+
+    private static final String playUrl = siteUrl + "/static/player/art.php?url=%s&thumb=%s";
 
 
 
@@ -153,11 +155,11 @@ public class Mtyy extends Spider {
        if (html.get().contains("验证码") || StringUtils.isAllBlank(html.get())) {
             MtyyKT.verify(searchUrl, html);
         } else if (html.get().contains("请不要频繁操作")) {
-            Utils.notify("麦田影视提示：请不要频繁操作");
+            Util.notify("麦田影视提示：请不要频繁操作");
         }
      /*    String res = OkHttp.string(searchUrl, Utils.webHeaders(searchUrl, "PHPSESSID=uv4hpgb9oqmp5lk6igtorlls38"));
        html.set(res);*/
-        String htm = OkHttp.string(searchUrl, Utils.webHeaders(searchUrl, html.get()));
+        String htm = OkHttp.string(searchUrl, Util.webHeaders(searchUrl, html.get()));
         Document document = Jsoup.parse(htm);
         SpiderDebug.log("++++++++++++麦田-搜索结果" + html.get());
 
@@ -175,7 +177,7 @@ public class Mtyy extends Spider {
         String codeUrl = this.siteUrl + "/verify/index.html?";
         Response resp = null;
         try {
-            resp = OkHttp.newCall(codeUrl, Utils.webHeaders(url));
+            resp = OkHttp.newCall(codeUrl, Util.webHeaders(url));
             return resp.body().bytes();
         } catch (IOException e) {
             SpiderDebug.log("请求验证码出错:" + e.getMessage());
@@ -192,7 +194,11 @@ public class Mtyy extends Spider {
         String json = matcher.find() ? matcher.group(1) : "";
         JSONObject player = new JSONObject(json);
         String url = player.getString("url");
+        String thumb = player.getString("vod_pic_thumb");
         String urlNext = player.getString("url_next");
+        String playerContent = OkHttp.string(String.format(playUrl, url, thumb), getHeader());
+        url = Util.findByRegex("(https?:\\/\\/[\\w\\.-]+(?:\\/[\\w\\.-]*)*\\.m3u8(?:\\?[^\\s]*)?)", playerContent, 0);
+
         SpiderDebug.log("++++++++++++麦田-playerContent" + Json.toJson(url));
 //        if (player.getInt("encrypt") == 1) {
 //            url = URLDecoder.decode(url);
