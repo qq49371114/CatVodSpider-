@@ -1,5 +1,5 @@
 {
-  "spider": "../jar/spider.jar;md5;95ca4777fd13000f349f2a90797e17a5",
+  "spider": "./jar/spider.jar",
   "sites": [
     {
       "key": "Intruduce",
